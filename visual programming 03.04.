@@ -1,0 +1,14 @@
+conda create -n pyside6n -c conda-forge pyside6 pttools #콘다의 파이사이드 6를 이용해 가상환경을 구축하겠다. 
+conda activate pyside6n # 방금 만든 가상환경 파이사이드6를 실행해라 -- 이러면 cmd에서 (base) 대신 (pyside6n)으로 가상환경이 설정될 것
+
+##########################
+
+(echo [Paths] & echo Prefix=..) > "%CONDA_PREFIX%\Library\lib\qt6\bin\qt.conf" #라이브러리 경로 인식 오류. 해결을 위해 설정 파일을 생성 
+
+#####################
+@echo off    
+if not defined _OLD_CONDA_QT_PATH (set "_OLD_CONDA_QT_PATH=%PATH%")      #1. 기존 path백업: 나중에 원래대로 되돌리기 위해 현재 경로 설정을 보관함
+set "PATH=%CONDA_PREFIX%\Library\lib\qt6\bin;%CONDA_PREFIX%\Library\bin;%PATH%"    #qt6 실행 파일 및 라이브러리 경로를 시스템 path 맨 앞에 추가 
+
+########
+  tasklist /m Qt6Core.dll  # 현재 실행 중인 프로세스 중 qt6라이브러리(core)를 사용하는 목록 확인 
