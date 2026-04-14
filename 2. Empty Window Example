@@ -1,0 +1,101 @@
+# -*- coding: utf-8 -*-
+#
+# empty_window_ps.py
+#
+# Description: 
+#       이 스크립트는 PySide6/PyQt6 애플리케이션의 기본적인 구조를 보여주는
+#       아주 간단한 빈 Qt 창을 생성하는 예제.
+# Author: dsaint31
+# Date: 2024-02-23
+#
+
+# 1. 필요한 library 및 module을 import 하기
+import sys    #시스템에서 건드리겠습니다.
+
+# PySide6/PyQt6 사용을 확인하기 위한 flag
+PYSIDE = False      #파이사이드랑,파이큐티중 나중에 확인이 가능하게끔 알려주는 것 상태 표시 
+PYQT = False        #기본값으로 둘다 퍼스라 깔아두기 
+
+# PySide6를 우선적으로 import 하도록 시도
+try:                                                                #try 일단 해 
+    import PySide6.QtCore                                            #파이사이드 6 파이큐티 라는 곳에서 
+    from PySide6.QtWidgets import (QApplication, QWidget, QLabel)    #이것들 가져오자 
+    PYSIDE = True                                                    #가져오면 이제 플래그가 트루가 된다. 
+except ImportError: # ImportError만 처리하여 예외 처리 명확성 증가     #임포트 에러뜨면 넘겨라 
+    pass # 실패 시, 특별한 처리 없이 넘어감                            
+
+# PySide6 import에 실패했을 경우, PyQt6를 import 하도록 시도
+if not PYSIDE:
+    try:                                                                # 안된 경우에 pyside에서 같은걸 실행해보자 
+        import PyQt6.QtCore
+        from PyQt6.QtWidgets import (QApplication, QWidget, QLabel)
+        PYQT = True                                                      #pyqt가 사실이 될거에요 
+    except ImportError: # ImportError만 처리하여 예외 처리 명확성 증가    #임포트에러 발생시 넘겨봐 
+        pass # 실패 시, 특별한 처리 없이 넘어감
+                                                                    #둘다 오류뜨면 여기에서 오류뜰 것
+# 2. 만들고자 하는 GUI 프로그램의 class를 구현
+# QWidget을 상속받아 새로운 class MW를 정의
+class MW(QWidget):                                                  #클래스 메인 윈도우 큐위젯 사용하고있는/ 이미 만들어져있는거 가져오기 >>파이사이드6에 설치되어있는 큐위젯 가져와서 완성되어있는거 가져와서 잘라서(상속받아서) 쓰겠다.
+    def __init__(self):                                             #__init__ >>기본값 세팅 이거 안하면 함수, 클래스, 인자 셋 다 꼬인다.>새집으로 이사가자 
+        """ 생성자(Constructor) """
+        # 부모 class인 QWidget의 생성자를 호출하여 초기화            
+        super().__init__()                                          #super 큐티위젯에서 끌어와서 기본 도면을 깔아보겠따. 
+        # UI 초기화를 담당하는 method 호출
+        self.initialize_ui()                                      # self내가 작업하고있는 그거 실행하자, initialize작업대 이름 호출이름
+
+    def initialize_ui(self):                                      #작업대 불러오자, self 내가 하고있는거 
+        """Application의 UI 설정을 담당"""
+        # Window의 위치와 크기를 설정. 
+        # setGeometry(x position, y position, width, height)     #위젯 뜨는 위치설정 
+        self.setGeometry(200, 100, 400, 200)                        #왼쪽 천장기준/ 왼쪽 위 기준으로 내리기 
+
+        # Window의 title bar에 보일 text를 설정
+        self.setWindowTitle("Main Window in PyQt or PySide. 한글.")   # 위에 작은 창 제목바 그짝에서 메인 위도우 ---- 뜨게 하자 
+
+        # Window에 포함될 widget들을 설정하는 method 호출
+        self.setup_main_wnd()                                      # 아래 있는 셀프 셋업 메인 윈도우 함수를 호출하겠다.
+
+        # 설정된 Window를 화면에 표시 
+        # (부모가 없는 widget은 show() 호출 필요)                   #보여주세요
+        self.show()
+
+    def setup_main_wnd(self):                                      #아래 목록들에 대한 묶음을 셋업 메인 윈도우로 하겠다. 
+        """메인 Window에 포함될 widget들을 생성 및 설정"""
+        # QLabel widget을 생성. 
+        # 생성자의 인자로 'self'를 넘겨주어, 이 widget의 parent를 MW instance로 지정.
+        hello_label = QLabel(self)                                #우리가 작업하고있는걸 큐라벨기능을 뜯어오서 헬로라벨이라고 설정하자 
+
+        # Label에 표시될 text를 'Hello, World and Qt!'로 설정  
+        hello_label.setText('Hello, World and Qt!')               #내용 글귀 지정 헬로 월드 그리고 qt 출력하기 
+
+        # Label의 위치를 
+        # parent widget의 좌상단으로부터 x=150, y=90 위치로 이동 
+        # (절대 위치 지정 방식)
+        hello_label.move(150,90)                                  #위젯 내부에서 글귀를 150 90만큼 떨어진 곳에서 하겠다
+
+# 3. Main script로 동작하는 루틴 구현
+if __name__ == '__main__':                                         #flag 에서 퍼스퍼스 뜨고, 클래스에 대해서도 실패를 하게되면 여기에서 파이사이드랑, 파이큐티 버전 내놓고
+    # PySide 사용 시 PySide6 버전 정보 출력
+    if PYSIDE:                                                     #둘중에 안깔린 걸 확인. 
+        print(PySide6.__version__)
+        print(PySide6.QtCore.__version__)
+    # PyQt 사용 시 PyQt6(Qt) 버전 정보 출력
+    elif PYQT:
+        print(PyQt6.QtCore.qVersion())
+    # PySide6나 PyQt6 모두 사용 불가능할 경우 메시지 출력 후 종료
+    else: 
+        print("Neither PySide6 nor PyQt6 is available. Please install one.")  #안깔릴 시 이 글귀출력해서 사용자에게 알려주자 
+        sys.exit(1)
+
+    # 모든 PyQt/PySide GUI application은 
+    # 하나의 QApplication instance를 필요로 함
+    # sys.argv를 통해 command line arguments를 application에 전달
+    app = QApplication(sys.argv)
+
+    # Main window(MW)의 instance를 생성
+    window = MW()                                                   #mw라는 클래스 호출 
+
+    # application의 event loop를 시작
+    # app.exec()가 반환하는 종료 코드를 
+    # sys.exit()에 전달하여 script를 안전하게 종료
+    sys.exit(app.exec())                                          #종료 제대로 해라 반환코드 
