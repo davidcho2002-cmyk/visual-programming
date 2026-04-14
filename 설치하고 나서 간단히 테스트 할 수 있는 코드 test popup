@@ -1,0 +1,13 @@
+from PySide6.QtWidgets import QLabel, QApplication  #파이사이드6, 큐티위젯 가져오자/ 큐라벨, 큐 어플리케이션 가져와서 사용하겠다
+import sys        #윈도우 os랑 직접 소통하겠다.
+
+app = QApplication(sys.argv)      #큐어플리케이션을 가져와서 이걸 app이라고 지정 sys->pyside, qtwidget, qapplication이랑 직접적으로 소통하겠다. argv하위 인자들에 대해 가져와서 sys에 정보를 넘겨주겠다.
+widget = QLabel("test!")          #위젯에서 test! 띄워 보겠다
+widget.resize(300, 200) # 창의 크기 설정 (너비, 높이)    #그 위젯의 크기를 가로 300, 세로 200 
+widget.show()        # 띄워봐
+sys.exit(app.exec())  #시스템에서 종료하기(메모리에서 0이라는걸 줘야 제대로 종료인데, 이 문구가 없을경우 붕 뜬 상태가 된다/ 종료는 되긴 함)
+
+
+
+
+##### 인자란- 우리가 넣어주는 값 
