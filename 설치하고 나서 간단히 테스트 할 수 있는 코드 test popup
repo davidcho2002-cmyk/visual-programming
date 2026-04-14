@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QLabel, QApplication  #파이사이드6, 큐티위젯 가져오자/ 큐라벨, 큐 어플리케이션 가져와서 사용하겠다
+from PySide6.QtWidgets import QLabel, QApplication  #파이사이드6, 큐티위젯 이라는 라이브러리에서 / 큐라벨, 큐 어플리케이션 가져와서 사용하겠다
 import sys        #윈도우 os랑 직접 소통하겠다.
 
 app = QApplication(sys.argv)      #큐어플리케이션을 가져와서 이걸 app이라고 지정 sys->pyside, qtwidget, qapplication이랑 직접적으로 소통하겠다. argv하위 인자들에 대해 가져와서 sys에 정보를 넘겨주겠다.
