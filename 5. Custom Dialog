@@ -1,22 +1,25 @@
 # QDialog를 상속받아 사용자 정의 대화상자 class를 정의
-class CustomDlg(QDialog):                                                                                        #클래스를 커스텀 다이아로그로 설정 큐다이아로그 가져오기 
-    def __init__(self, parent=None):                                                                             #__init__(self)는 부모칸 아예 없애버려서 대체해버리는거고, __init__(self,parent=None)은 부모칸이 존재, 부모가 있는지 없는지는 모르는거 넣을 수 있게끔. 종속이 되어버린다. 
-        """ 생성자(Constructor) """
+class CustomDlg(QDialog):                                                                                       #클래스를 커스텀 다이아로그로 설정 큐다이아로그 가져오기 
+    def __init__(self, parent=None):                                                                            #__init__(self)는 부모칸 아예 없애버려서 대체해버리는거고, __init__(self,parent=None)은 부모칸이 존재, 부모가 있는지 없는지는 모르는거 넣을 수 있게끔. 종속이 되어버린다. 
+        """ 생성자(Constructor) """                                                                              #slef는 패치가 안되고 내가 설정한 그대로 생성 / self, parent=None은 다이아로그에서 패치되면 내 파일도 패치가 같이되는 
         super().__init__(parent)
 
         self.setWindowTitle('Hello, QDialog')                                                                   #타이틀바를 헬로 큐다이아로그로 한다 
 
         # QDialogButtonBox를 사용하여 표준 버튼 (OK, Cancel)을 생성
-        buttons = QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
-        self.button_box = QDialogButtonBox(buttons)
+        buttons = QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel                   #버튼 변수=큐다이아로그버튼박스 가져와서 스텐다드버튼 가져오기. ok버튼 가져오기 | 캔슬버튼 두개 다 가져오기  / 이거를 버튼즈에 저장하자 
+        self.button_box = QDialogButtonBox(buttons)                                                             #자식창에다가 
         # button_box의 accepted 시그널을 QDialog의 내장 슬롯인 accept에 연결
-        self.button_box.accepted.connect(self.accept)
+        self.button_box.accepted.connect(self.accept)                                                           #ok하면 허가 연결한다. 
         # button_box의 rejected 시그널을 QDialog의 내장 슬롯인 reject에 연결
-        self.button_box.rejected.connect(self.reject)
+        self.button_box.rejected.connect(self.reject)                                                           #cancel하면 연결 거부 .    
 
         # 대화상자 내부 레이아웃 설정
-        self.layout = QVBoxLayout()
-        message = QLabel('Is something ok?')
-        self.layout.addWidget(message)
-        self.layout.addWidget(self.button_box)
-        self.setLayout(self.layout)
+        self.layout = QVBoxLayout()                                                                             #보여주는 모든 칸을 수직으로 보이게끔 
+        message = QLabel('Is something ok?')                                                                    #메시지 'Is something ok?' 변수 정의 해주기 
+        self.layout.addWidget(message)                                                                          #메시지(is someth....) 올리겁니다. 
+        self.layout.addWidget(self.button_box)                                                                  #메시지에 병렬로 연결한 ok cancel올릴 것 
+        self.setLayout(self.layout)                                                                             #이 위의 것들을 모두 띄우겠다. 
+
+#init(self) 지정해주기 
+#self.()는 안에있는거 사용 
