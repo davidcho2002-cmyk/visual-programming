@@ -1,10 +1,10 @@
 # QDialog를 상속받아 사용자 정의 대화상자 class를 정의
 class CustomDlg(QDialog):                                                                                        #클래스를 커스텀 다이아로그로 설정 큐다이아로그 가져오기 
-    def __init__(self, parent=None):                                                                             #
+    def __init__(self, parent=None):                                                                             #__init__(self)는 부모칸 아예 없애버려서 대체해버리는거고, __init__(self,parent=None)은 부모칸이 존재, 부모가 있는지 없는지는 모르는거 넣을 수 있게끔. 종속이 되어버린다. 
         """ 생성자(Constructor) """
         super().__init__(parent)
 
-        self.setWindowTitle('Hello, QDialog')
+        self.setWindowTitle('Hello, QDialog')                                                                   #타이틀바를 헬로 큐다이아로그로 한다 
 
         # QDialogButtonBox를 사용하여 표준 버튼 (OK, Cancel)을 생성
         buttons = QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
