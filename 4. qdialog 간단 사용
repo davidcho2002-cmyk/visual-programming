@@ -8,42 +8,42 @@
 # Date: 2024-02-23
 #
 
-import sys
+import sys                                                                                            # 시스템 불러오기 
 
 # Qt 바인딩 선택 로직 (PySide6/PyQt6 호환성)
-try:
-    from PySide6.QtWidgets import (QApplication, QDialog, QMainWindow, QPushButton)
-except ImportError:
+try:                                                                                                  #시도하자 
+    from PySide6.QtWidgets import (QApplication, QDialog, QMainWindow, QPushButton)                   #이하 품목들 가져오고 
+except ImportError:                                                                                   #임포트 에러가 난 경우에는 
     try:
-        from PyQt6.QtWidgets import (QApplication, QDialog, QMainWindow, QPushButton)
-    except ImportError:
+        from PyQt6.QtWidgets import (QApplication, QDialog, QMainWindow, QPushButton)                 #이하 품목들 가져오고 
+    except ImportError:                                                                               #또 임포트 에러가 난 경우에는 ("Python을 위한 Qt 바인딩 라이브러리가 없습니다.") 프린트 하고 시스템 종료 
         print("Python을 위한 Qt 바인딩 라이브러리가 없습니다.")
-        sys.exit(1)
+        sys.exit(1)                                                                                    #(1) 에러나서 종료한다는 뜻 /에러코드 중 하나 
 
 # 메인 윈도우 class 정의
-class MW(QMainWindow):
-    def __init__(self):
+class MW(QMainWindow):                                                                                #클래스를 mw로 지정. 큐메인윈도우를 가져오기 
+    def __init__(self):                                                                               #기본값 지정 
         """ 생성자(Constructor) """
-        super().__init__()
-        self.setWindowTitle("QDialog Ex.")
+        super().__init__()                                                                            #메인윈도우 가져온거도 기본값 
+        self.setWindowTitle("QDialog Ex.")                                                            #조그마한 위에 라벨 제목 "QDialog Ex."로 하자 
 
         # 버튼을 누르면 대화상자를 열도록 설정
-        button = QPushButton("Press it for a Dialog")
-        button.clicked.connect(self.button_clicked)
-        self.setCentralWidget(button)
+        button = QPushButton("Press it for a Dialog")                                                 #버튼=큐푸쉬버튼 가져와서 "Press it for a Dialog"로 설정 버튼 자체만 존재 
+        button.clicked.connect(self.button_clicked)                                                   #버튼이 클릭되었을 때 연결하겠다. 이하의 함수를 연결하겠다. (동작이 실행되게 만들겠다. )/self.button_clicked라는 함수 
+        self.setCentralWidget(button)                                                                 #메인 창 위에 중앙에 버튼 놓겠다. 
 
-    def button_clicked(self, s):
+    def button_clicked(self, s):                                                                      #button_clicked라는 함수 설명   s는 로그 같은 느낌
         """ 버튼 클릭 시 호출되는 슬롯 """
-        print("click", s)
+        print("click", s)                                                                            #cmd에 띄우기 
 
         # QDialog의 기본 인스턴스를 생성.
         # 부모를 self(MW)로 지정.
-        dlg = QDialog(self)
-        dlg.setWindowTitle("QDialog Title")
+        dlg = QDialog(self)                                                                          #dlg 큐다이아로그 가져오기 /큐다이아로그란 대화상자 클릭해서 나오는 창 
+        dlg.setWindowTitle("QDialog Title")                                                          #뜬 작은 창의 작은 라벨에 큐다이아로그 라고 박아버리자   
 
 
         # Modal 방식 대화상자 코드
-        dlg.exec()
+        dlg.exec()                                                                                    #exec 모달상태로 막아버리자/ 모달: 부모창에서 자식창 띄울때 부모창 더이상 수정 못하게끔 자식창이 뜬 동안 코드도 일시중지 
 
         # # 다음은 open()을 사용하여
         # # GUI상에선 부모는 disable시키나 blocking모드는 아닌 형태로 실행. 
@@ -55,10 +55,10 @@ class MW(QMainWindow):
         # #           코드 실행을 멈추지 않음.
         # dlg.show()
 
-        print("test: blocking mode!")
+        print("test: blocking mode!")                                                               #자식창 닫으면 cmd에 "test: blocking mode!"뜨게 하자 
 
 # Main script로 동작하는 루틴 구현
-if __name__ == "__main__":
+if __name__ == "__main__":                                                                             #직접실행아니면 하지못하게  /종료시  메모리 0만들고 종료 
     app = QApplication(sys.argv)
     window = MW()
     window.show()
