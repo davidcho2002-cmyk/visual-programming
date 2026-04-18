@@ -26,45 +26,45 @@ class MW(QWidget):
         self.show()
 
     def setup_main_wnd(self):
-        lm = QVBoxLayout()
+        lm = QVBoxLayout()                                                                        #qv박스 정렬할거야 이걸 lm이라 할거야 
 
-        lm.addWidget(QLabel("Input:"))
-        self.le = QLineEdit()
-        self.le.setPlaceholderText("텍스트를 입력하고 드래그로 선택 후 버튼을 눌러보세요.")
-        lm.addWidget(self.le)
+        lm.addWidget(QLabel("Input:"))                                                            #lm 에서 위젯을 추가해서 큐라벨 가져오고 인풋이라 적을거야                   
+        self.le = QLineEdit()                                                                     #글씨적는칸 가져다 두기 네모난 칸 /입력칸         
+        self.le.setPlaceholderText("텍스트를 입력하고 드래그로 선택 후 버튼을 눌러보세요.")           #입력칸이 비어있을 때 '텍스트를 입력하고 드래그로 선택 후 버튼을 눌러보세요' 이 글씨를 적어둔다                              
+        lm.addWidget(self.le)                                                                     #lm: 세로로 배치하라 le: 입력칸  lm에다가 le를 추가하라                        
 
         # 각 버튼 → 해당 method 직접 연결
-        btn_layout = QHBoxLayout()
-        for label, slot in [
-            ("cut",   self.le.cut),
-            ("copy",  self.le.copy),
-            ("paste", self.le.paste),
-            ("undo",  self.le.undo),
-            ("redo",  self.le.redo),
+        btn_layout = QHBoxLayout()                                                                #btn배치>가로로 정렬                     
+        for label, slot in [                                                                      #라벨은 버튼 네임텍 / 슬롯은 실제 실해되는 값 하나씩 꺼내라                                
+            ("cut",   self.le.cut),                                                               #잘라, 실제로 실행되게끔 le에다가 자르기 영향을 줘라 
+            ("copy",  self.le.copy),                                                              #복사, 실제로 실행되게끔 le에다가 복사하기                           
+            ("paste", self.le.paste),                                                             #붙여넣기 , ''                   
+            ("undo",  self.le.undo),                                                              #컨트롤 z              
+            ("redo",  self.le.redo),                                                              #컨트롤 y               
         ]:
-            btn = QPushButton(label)
-            # button에 포커스를 뺏기면 선택영역이 사라지므로 다음 처리 필요.
-            btn.setFocusPolicy(Qt.FocusPolicy.NoFocus) #windows and linux
-            btn.clicked.connect(slot)
-            btn_layout.addWidget(btn)
+            btn = QPushButton(label)                                                             #방금 만든 리스트 버튼에 적용시켜보기            
+            # button에 포커스를 뺏기면 선택영역이 사라지므로 다음 처리 필요.    
+            btn.setFocusPolicy(Qt.FocusPolicy.NoFocus) #windows and linux                        #버튼 눌렀을 때 규칙 만들기/ 탭하면서 입력창 변경되는거 막기                                 
+            btn.clicked.connect(slot)                                                            #버튼 눌렸을 때 실제로 동작하게끔     
+            btn_layout.addWidget(btn)                                                            #가로로 정렬해서 버튼 나열하겠다.                     
 
-        lm.addLayout(btn_layout)
+        lm.addLayout(btn_layout)                                                                 #방금 가로로 정렬한거 다음 행에 입력하겠다.       
 
         # undo / redo 가능 여부를 실시간으로 표시
-        self.status_label = QLabel("undo: -, redo: -")
-        lm.addWidget(self.status_label)
-        self.le.textChanged.connect(self.update_status)
+        self.status_label = QLabel("undo: -, redo: -")                                           # 스테라벨이라고 변수 새로 지정 / 큐라벨 가져와서 거기에 언두:, 리두: 라 적어둔다                    
+        lm.addWidget(self.status_label)                                                          #그 다음행에 또 적어 넣겠다.   
+        self.le.textChanged.connect(self.update_status)                                          #입력칸에 텍스트가 바뀌면 밑의 함수 호출               
 
-        self.setLayout(lm)
+        self.setLayout(lm)                                                                       #도장꽝     
 
-    def update_status(self):
-        undo_ok = self.le.isUndoAvailable()
-        redo_ok = self.le.isRedoAvailable()
-        self.status_label.setText(
+    def update_status(self):                                                                    #상태 알리미 함수지정      
+        undo_ok = self.le.isUndoAvailable()                                                     #언두오케: 언두가 가능하면 신호보내기                
+        redo_ok = self.le.isRedoAvailable()                                                     #리두오케: 리두가 가능하면 신호보내기    
+        self.status_label.setText(                                                              #status_label 변수 건드리겠다. /언두리두를 |언두리두 오케이로 바꾸기  
             f"undo available: {undo_ok}  |  redo available: {redo_ok}"
         )
 
-if __name__ == "__main__":
+if __name__ == "__main__":                                                                     #여기서만 실행할거고 종료시 제대로 꺼라        
     app = QApplication(sys.argv)
     wnd = MW()
     sys.exit(app.exec())
