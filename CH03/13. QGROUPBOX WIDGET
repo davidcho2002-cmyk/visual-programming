@@ -41,10 +41,10 @@ class MW(QWidget):
         self.show()
 
     def setup_main_wnd(self):
-        lm = QHBoxLayout()
+        lm = QHBoxLayout()                                                                #가로로 정렬 
 
         # 왼쪽 - QCheckBox 그룹 (복수 선택 가능, enable/disable 토글 가능)
-        self.grp_checks = QGroupBox("QCheckBox Grp")
+        self.grp_checks = QGroupBox("QCheckBox Grp")                                            
         self.grp_checks.setCheckable(True)
         self.grp_checks.setChecked(False)   # 초기 상태 - disabled
 
