@@ -5,7 +5,7 @@ import os
 try:
     from PySide6.QtWidgets import (
         QApplication, QWidget,
-        QLabel, QPushButton,
+        QLabel, QPushButton,                                                    #사용하는 툴 가져오기 
     )
     from PySide6.QtGui import QFont, QIcon
     from PySide6.QtCore import Qt, QSize
@@ -13,7 +13,7 @@ try:
 except ImportError:
     try:
         from PyQt6.QtWidgets import (
-            QApplication, QWidget,
+            QApplication, QWidget,                                            #에러시 후속 조치 다른거로 다시 가져오기 
             QLabel, QPushButton,
         )
         from PyQt6.QtGui import QFont, QIcon
@@ -21,74 +21,73 @@ except ImportError:
         qt_modules = 'PyQt6'
     except ImportError:
         print("PySide6 또는 PyQt6가 설치되어 있지 않습니다.")
-        sys.exit(1)
-
+        sys.exit(1)                                                           #에러 후속조치 시스템 종료              
+    
 print(f"Using {qt_modules} binding.")
 
 
-class MW(QWidget):
-
+class MW(QWidget):                                                            #기본값 설정                
     def __init__(self):
         super().__init__()
         self.init_ui()
 
-    def init_ui(self):
+    def init_ui(self):                                                       #이니셜라이징 유아이를 이하로 지정             
         self.setWindowTitle('QPushButton Example')
         self.setup_main_wnd()
         self.show()
 
-    def setup_main_wnd(self):
+    def setup_main_wnd(self):                                            
         # text label - slot에서 접근하므로 instance attribute로 생성
-        self.hello_label = QLabel(self)
+        self.hello_label = QLabel(self)                                     #폰트를 이하로 지정    
         self.hello_label.setText('Hello, World and Qt!')
         self.hello_label.setFont(QFont('Arial', 15))
         self.hello_label.resize(230, 40)
         self.hello_label.move(10, 20)
 
         # 아래 줄을 주석 해제하여 정렬 / 배경색 동작 확인 가능
-        # self.hello_label.setAlignment(Qt.AlignmentFlag.AlignCenter)  # PySide6 / PyQt6 모두 동작
+        # self.hello_label.setAlignment(Qt.AlignmentFlag.AlignCenter)  # PySide6 / PyQt6 모두 동작            #사진 크기 지정, 배경 지정 
         # self.hello_label.setAlignment(Qt.AlignCenter)                # PySide6 전용 (하위 호환)
         # self.hello_label.setStyleSheet("background-color: yellow")
 
         # 스크립트 위치 기준으로 image 경로 계산
-        base_dir = os.path.dirname(os.path.realpath(__file__))
+        base_dir = os.path.dirname(os.path.realpath(__file__))           #경로 지정해주겠다                 
         img_path = os.path.join(base_dir, 'img/world.png')
 
         # icon + text 버튼
-        it_button = QPushButton("icon and text button", self)
-        it_button.setIcon(QIcon(img_path))
-        it_button.clicked.connect(self.it_btn_clicked)
-        it_button.resize(150, 50)
-        it_button.move(50, 70)
+        it_button = QPushButton("icon and text button", self)            #버튼안에다가 아이콘을 집어넣겠다. 
+        it_button.setIcon(QIcon(img_path))            
+        it_button.clicked.connect(self.it_btn_clicked)                                    
+        it_button.resize(150, 50)                                        #버튼 가져와서 150,50크기에 50,70위치에      
+        it_button.move(50, 70)                                
 
         # icon 전용 버튼 (text 없음)
-        icon_button = QPushButton(self)
+        icon_button = QPushButton(self)                                         #아이콘만 있는거    
         icon_button.setIcon(QIcon(img_path))
-        icon_button.setIconSize(QSize(120, 30))  # icon 크기 명시적으로 고정
-        icon_button.clicked.connect(self.icon_btn_clicked)
-        icon_button.resize(150, 50)
-        icon_button.move(50, 130)
+        icon_button.setIconSize(QSize(120, 30))  # icon 크기 명시적으로 고정      #아이콘 120,30 사이즈   
+        icon_button.clicked.connect(self.icon_btn_clicked)                      #아래 함수 호출           
+        icon_button.resize(150, 50)                                             #버튼 사이즈 150, 50    
+        icon_button.move(50, 130)                                               버튼을 50,130에 위치      
 
-        # text 전용 버튼 (icon 없음)
-        text_button = QPushButton("text button", self)
-        text_button.clicked.connect(self.text_btn_clicked)
-        text_button.resize(150, 50)
-        text_button.move(50, 190)
-
-    def it_btn_clicked(self):
+        # text 전용 버튼 (icon 없음)                                             #텍스트만 있는거    
+        text_button = QPushButton("text button", self)                          #큐푸쉬 가져오기                           
+        text_button.clicked.connect(self.text_btn_clicked)                      #아래 함수 가져오기 
+        text_button.resize(150, 50)                                             #버튼 사이즈 150,50                
+        text_button.move(50, 190)                                               #버튼 위치 50,90                             
+                                                                                            
+    def it_btn_clicked(self):                                                   #이 함수 정의                  
         """icon + text 버튼 클릭 시 호출됨."""
-        self.hello_label.setText("Icon and text Button")
+        self.hello_label.setText("Icon and text Button")                        #icon + text 버튼 뜸                     
 
     def icon_btn_clicked(self):
-        """icon 전용 버튼 클릭 시 호출됨."""
+        """icon 전용 버튼 클릭 시 호출됨."""                                      #icon 전용 버튼 (text 없음)  버튼 뜸         
         self.hello_label.setText("Icon Button")
 
-    def text_btn_clicked(self):
+    def text_btn_clicked(self):                                                 #text 전용 버튼 (icon 없음)   버튼 뜸     
         """text 전용 버튼 클릭 시 호출됨."""
         self.hello_label.setText("text Button")
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':                                                     #여기서만 실행되는거고, 깔끔하게 종료하자                                    
     app = QApplication(sys.argv)
     wnd = MW()
     sys.exit(app.exec())
