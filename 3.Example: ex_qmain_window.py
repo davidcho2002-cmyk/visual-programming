@@ -107,11 +107,11 @@ if __name__ == '__main__':                                                      
         sys.exit(1)
 
     # 모든 GUI app은 하나의 QApplication instance를 필요로 함
-    app = QApplication(sys.argv)                                                             #gui를 전체적으로 관리하는 라이브러리 이름 
+    app = QApplication(sys.argv)                                                             #gui를 전체적으로 관리하는 라이브러리 이름/ 큐어플 사용, 시스템에서 간섭이 가능하게 만든다 
     # Main window(MW)의 instance를 생성
-    window = MW()
+    window = MW()                                                                           #지금까지 짠 코드 불러오기 위에 show는 보여주겠습니다.  class내부에있기에 호출되기 전에는 실행되지 않음. 지금 실행시킨 것 
     # application의 event loop를 시작
-    sys.exit(app.exec())
+    sys.exit(app.exec())                                                                    #시스템 종료 
 
 
 
