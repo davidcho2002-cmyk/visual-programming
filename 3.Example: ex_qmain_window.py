@@ -37,7 +37,7 @@ if not PYSIDE:                                                                  
 
 # QMainWindow를 상속받아 메인 윈도우 class를 정의.
 # QMainWindow는 메뉴바, 툴바, 상태바 등을 포함할 수 있는 표준적인 메인 윈도우용 클래스.
-class MW(QMainWindow):
+class MW(QMainWindow):                                                              # 아래 코드에 대해서 클래스 MW라고 생각해보자 그 토대를 '큐메인윈도우'로 사용   
     def __init__(self):
         """ 생성자(Constructor) """
         # 부모 class인 QMainWindow의 생성자를 호출
