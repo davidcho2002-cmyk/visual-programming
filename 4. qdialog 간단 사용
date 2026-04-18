@@ -1,0 +1,66 @@
+# -*- coding: utf-8 -*-
+#
+# first_dlg.py
+#
+# Description: QDialog를 생성하고 실행하는 가장 기본적인 방법을 보여주는 예제.
+#              특히 'modeless' 방식인 open() 메서드 사용법을 다룸.
+# Author: dsaint31
+# Date: 2024-02-23
+#
+
+import sys
+
+# Qt 바인딩 선택 로직 (PySide6/PyQt6 호환성)
+try:
+    from PySide6.QtWidgets import (QApplication, QDialog, QMainWindow, QPushButton)
+except ImportError:
+    try:
+        from PyQt6.QtWidgets import (QApplication, QDialog, QMainWindow, QPushButton)
+    except ImportError:
+        print("Python을 위한 Qt 바인딩 라이브러리가 없습니다.")
+        sys.exit(1)
+
+# 메인 윈도우 class 정의
+class MW(QMainWindow):
+    def __init__(self):
+        """ 생성자(Constructor) """
+        super().__init__()
+        self.setWindowTitle("QDialog Ex.")
+
+        # 버튼을 누르면 대화상자를 열도록 설정
+        button = QPushButton("Press it for a Dialog")
+        button.clicked.connect(self.button_clicked)
+        self.setCentralWidget(button)
+
+    def button_clicked(self, s):
+        """ 버튼 클릭 시 호출되는 슬롯 """
+        print("click", s)
+
+        # QDialog의 기본 인스턴스를 생성.
+        # 부모를 self(MW)로 지정.
+        dlg = QDialog(self)
+        dlg.setWindowTitle("QDialog Title")
+
+
+        # Modal 방식 대화상자 코드
+        dlg.exec()
+
+        # # 다음은 open()을 사용하여
+        # # GUI상에선 부모는 disable시키나 blocking모드는 아닌 형태로 실행. 
+        # dlg.open()
+
+        # # 다음은 show()을 사용하여
+        # # 대화상자를 'Modeless' 형태로 실행 (당연히 non-blocking모드)
+        # # Modeless: 이 대화상자가 열려 있어도 부모 윈도우(MW)를 계속 사용할 수 있음
+        # #           코드 실행을 멈추지 않음.
+        # dlg.show()
+
+        print("test: blocking mode!")
+
+# Main script로 동작하는 루틴 구현
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MW()
+    window.show()
+    # sys.exit()를 사용하여 application을 안전하게 종료
+    sys.exit(app.exec())
