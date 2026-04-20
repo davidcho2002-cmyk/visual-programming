@@ -54,11 +54,11 @@ class MW(QWidget):
         self.bg.setExclusive(True)                                                 #하나만 선택 기능 켜기  
         self.bg.buttonClicked.connect(self.on_checkbox_clicked)                    #함수 호출     
 
-        # exclusive 모드 전환용 check box
+        # exclusive 모드 전환용 check box                                                
         # exclusive=True → 복수 선택 불가이므로, 초기 체크 상태는 False
         self.cb_toggle_exclusive = QCheckBox("Check it for multiple selection.")   #변수지정 체크박스 하나 만들기  
-        self.cb_toggle_exclusive.setChecked(not self.bg.exclusive())               #시비토글 배타 체크되면 괄호 안 내용 실행/ 아니게 한다 단일선택을              
-        self.cb_toggle_exclusive.toggled.connect(self.on_toggle_exclusive)         #체크되면 함수 호출
+        self.cb_toggle_exclusive.setChecked(not self.bg.exclusive())               #시비토글 배타 체크되면 괄호 안 내용 실행/ self.bg.exclusive()  exclusive: 단일선택인지(ture) 다중선택인지(false) 확인하는 매서드. /처음 아래 다중선택 체크칸에 대해 표시없는 상태로 시작하겠습니다.           
+        self.cb_toggle_exclusive.toggled.connect(self.on_toggle_exclusive)         #변수에 대해 / 이 체크박스의 체크상태가 바뀌면 이하 함수 호출 /connect 괄호 안의 함수에 대해 연결하겠다 
         lm.addWidget(self.cb_toggle_exclusive)                                     #다음 행에 배치  
 
     def on_checkbox_clicked(self, button):                                         #함수 정의   
@@ -68,14 +68,14 @@ class MW(QWidget):
         self.dp_label.setText(button.text())
 
     def on_toggle_exclusive(self, state: bool):                                   #함수 정의            
-        """exclusive 모드 on/off 전환 처리.
+        """exclusive 모드 on/off 전환 처리.                                        #state : 체크가 되어있는지 안되어있는지 qt에 자동으로 전달     
         전환 전에 모든 check box를 unchecked 상태로 초기화함.
         """
         print(f"multiple selection mode: {state}")                               #CMD에 상태 출력 트루퍼스로                
-        self.reset_checkboxes(False)                                             #표시되면 트루에서 퍼스로 바꾸기    
-        self.bg.setExclusive(not state)                                          #다시바꿔줘         
+        self.reset_checkboxes(False)                                             #체크가 선택/해제 시마다 위에 그룹박스 체크란을 초기화 false 선택 해제로 만들어라     
+        self.bg.setExclusive(not state)                                          #버튼은 ture>선택됨/false>선택 해제 --- setExclusive() true>단일선택/false>다중선택 :::버튼 선택시 다중선택되게, 해재시 단일 선택되게 현재 서로 true false가 엇갈린 상태라서 not으로 우리가 원하는 상태로 적용           
 
-    def reset_checkboxes(self, state: bool):                                     #모든 체크박스 상태 다같이 맞춰주기          
+    def reset_checkboxes(self, state: bool):                                     #모든 체크박스 상태 다같이 맞춰주기 / 위에서 state를 false로 지정, 기본값이 해제상태          
         """모든 check box를 주어진 상태(state)로 설정함.
 
         exclusive 모드에서는 Qt가 "항상 하나는 checked 상태를 유지"하도록 강제함.
@@ -99,13 +99,13 @@ class MW(QWidget):
             QButtonGroup에서 직접 버튼 목록을 가져오므로
             self.checkboxes 같은 별도 attribute를 유지하지 않아도 됨.
         """
-        old_exclusive = self.bg.exclusive()                                    #변수생성 단일선택 상태 버튼에 지정 
-        self.bg.setExclusive(False)                                            #단일선택 잠깐 끄기 다중선택 가능        
+        old_exclusive = self.bg.exclusive()                                    #올드 익스클루시브= 트루 퍼스로 받고, 단일선택인지 아닌지 여부를 올드 익스클루시브에 연동  
+        self.bg.setExclusive(False)                                            #단일선택을 꺼야 체크 해제가 되기에 단일선택 끄기       
 
-        for cb in self.bg.buttons():   # approach 03                           #체크박스 해제 반복          
+        for cb in self.bg.buttons():   # approach 03                           #체크박스 1,2,3,반복(FOR문으로)          
             cb.setChecked(state)                                               #체크박스 모두 체크 해제         
 
-        self.bg.setExclusive(old_exclusive)                                    #다중선택을 가져와서 다시 단일화   
+        self.bg.setExclusive(old_exclusive)                                    #올드 익스클루시브에 상위에 있던 상태 저장 약식으로 하고 , SETEXCLUSIVE에서 무조건 퍼스로 바꿔서 체크 해제 시킬거야, 다시 상위에 있던 상태 불러올거야    
         print("--------------")                                                #CMD에서 ---------출력       
 
 
