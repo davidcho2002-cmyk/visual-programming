@@ -1,0 +1,92 @@
+import sys
+
+try:
+    from PySide6.QtWidgets import (
+        QApplication, QWidget, QLabel,
+        QVBoxLayout, QLineEdit,
+    )
+    qt_modules = 'PySide6'
+except ImportError:
+    try:
+        from PyQt6.QtWidgets import (
+            QApplication, QWidget, QLabel,
+            QVBoxLayout, QLineEdit,
+        )
+        qt_modules = 'PyQt6'
+    except ImportError:
+        print("PySide6 또는 PyQt6가 설치되어 있지 않습니다.")
+        sys.exit(1)                                                              #파이사이드 큐티 가져와서 알아 하세요   
+
+
+class MW(QWidget):
+
+    def __init__(self):
+        super().__init__()                                                          #기본값 저장 
+        self.init_ui()
+
+    def init_ui(self):
+        self.setWindowTitle("QLineEdit Signal Example")
+        self.setup_main_wnd()
+        self.show()                                                  
+
+    def setup_main_wnd(self):
+        lm = QVBoxLayout()                                                           #수직으로 큐브이박스 가져올게요      
+
+        lm.addWidget(QLabel('What is most important?'))                              #다음 행에 'What is most important?'라 써진 글귀 추가 
+
+        self.le = QLineEdit()                                                        #입력창을 le라 지정  
+        self.le.setMaxLength(10)                         # 최대 10자 제한             #입력창 10자까지만 되게끔      
+        self.le.setPlaceholderText("Type something...")  # placeholder text          #뒷배경에 ("Type something...") 뜨게금 하기   
+
+        # 각 Signal을 Slot(메서드)에 연결
+        self.le.returnPressed.connect(self.on_return_pressed)                        #엔터누를 때 이하 함수 가져오기   
+        self.le.textChanged.connect(self.on_changed)                                 #문자변경시 이하 함수 가져오기  
+        self.le.textEdited.connect(self.on_edited)                                   #문자 추가 시 이하 함수 가져오기  
+        self.le.editingFinished.connect(self.on_editing_finished)                    #입력 종료 시 이하 함수 가져오기         
+
+        lm.addWidget(self.le)                                                        #손 위에서 정리 중 
+
+        # 결과 표시용 Label 4개 생성
+        self.dp_label0 = QLabel("textChanged: (대기 중)")                             #라벨에다가 글자 넣고 변수값으로 하나씩 지정    
+        self.dp_label1 = QLabel("textEdited: (대기 중)")
+        self.dp_label2 = QLabel("editingFinished: (대기 중)")
+        self.dp_label3 = QLabel("textChanged (직접 연결): (대기 중)")
+
+        for lbl in (self.dp_label0, self.dp_label1,                                  #수직으로 0부터 3까지 정렬 반복문 사용해서 레이아웃 정렬해둠           
+                    self.dp_label2, self.dp_label3):
+            lm.addWidget(lbl)
+
+        # textChanged Signal을 QLabel.setText에 직접 연결하는 방법
+        self.le.textChanged.connect(self.dp_label3.setText)                          #라벨 3에다가 변경되는 값 입력  입력창이랑 동기화     
+
+        self.setLayout(lm)                                                           #도장 꽝        
+
+    def on_return_pressed(self):                                                     #리턴프레스드 함수값 가져오기                      
+        """Enter/Return 키 입력 시 호출됨."""
+        selected = self.le.selectedText()                                            #드레그된 글자를 변수로 지정         
+        print(f"[returnPressed] selected text: '{selected}'")                        #cmd에 출력         
+
+    def on_changed(self, text: str):                                                 #체인지드/텍스트라는 변수는 문자열    모두 다 : 이후의 입력값 변경 
+        """textChanged Signal 처리.
+        코드에 의한 setText() 호출 시에도 emit됨.
+        """
+        self.dp_label0.setText(f"textChanged: '{text}'")                             #입력창에 따라 텍스트 변경   동기화시킬게/ 입력창 바뀌는 것에 대해 신호 받고, 입력창의 값도 같이 넘겨준다 
+
+    def on_edited(self, text: str):                                                    
+        """textEdited Signal 처리.
+        사용자가 직접 키보드로 입력할 때만 emit됨.
+        """
+        self.dp_label1.setText(f"textEdited: '{text}'")
+
+    def on_editing_finished(self):                                                   #함수 정의                        
+        """editingFinished Signal 처리.
+        이 Signal은 인자를 전달하지 않으므로 text()로 직접 가져옴.
+        """
+        current_text = self.le.text()                                               #변수지정, /현재 텍스트 가져와서 라벨 2에다가 입력    
+        self.dp_label2.setText(f"editingFinished: '{current_text}'")                #: 이후의 입력값 변경         
+
+
+if __name__ == "__main__":                                                          #여기서만 실행하고 깔끔하게 종료하세요 
+    app = QApplication(sys.argv)                
+    main_wnd = MW()
+    sys.exit(app.exec())
