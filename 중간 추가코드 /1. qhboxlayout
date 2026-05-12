@@ -1,0 +1,66 @@
+import sys                                                                         #시스템 간섭 
+import traceback                                                                   #에러내용 자세하게 보여주세요  
+
+PYSIDE = True                                                                      #파이사이드가 가능하다 가정         
+try:
+    from PySide6.QtWidgets import (QApplication, QWidget,                          #시도해보겠습니다. 이하 툴들 가져올게요 
+                            QMainWindow,
+                            QLabel,
+                            QHBoxLayout,
+                            )
+    from PySide6.QtCore import Qt
+except:                                                                            #아닌경우에      
+    # https://ds31x.tistory.com/151
+    e_msg = traceback.format_exc()                                                 #변수 지정= 에러메세지를 상세하게 문자열로 저장해서 emsg에 집어넣겠다.                 
+    print(e_msg)                                                                   #cmd에다가 emsg보여줄거에요 
+    PYSIDE = False                                                                 #파이사이드가 사용불가시      
+
+PYQT = True                                                                        #파이큐티 트루라 가정                  
+if not PYSIDE:                                                                     #만약 파이사이드가 안되는 경우에          
+    try:                                                                           #이하 품목들 가져와서 실항하겠습니다.                  
+        from PyQt6.QtWidgets import (QApplication, QWidget, QMainWindow,
+                                    QLabel,
+                                    QHBoxLayout,
+                                    )
+        from PyQt6.QtCore import Qt
+    except:                                                                        #아니면      
+        e_msg = traceback.format_exc()                                             #오류를 상세하게 저장해서 emsg로 저장                              
+        print(e_msg)                                                               #cmd에 프린트해요            / 위 emsg 아래 emsg랑은 서로 다른 것 지역 변수라 한다. try, exept를 한 세트로 봐야됨 
+        PYQT = False                                                               #파잌티가 퍼스라 가정                      
+
+class DsLabel(QLabel):                                                             #dslabel을 큐라벨 에서 상속                      
+
+    def __init__(self,text,color):                                                 #정의하겠다. 기본값지정, 텍스트, 색을 설정  /매개변수                                             
+        super().__init__(text)                                                     #여기서 영향을 주면 qlabel에도 영향 줄게요 / 부모인 큐 라벨도 실행을 기본생성자로 설정, 그 안에 들어갈 글자를 text라 설정     
+        self.setStyleSheet(f"background-color: {color}")                           #우리가 이후에 지정할 setstylesheet 에 대해 라벨 변경색을 입력받는 값에 따라 바꾸겠습니다.                      
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)                            #setalignment라는 메서드 사용, qt에서 정렬 관련 묶음집 가져와서 , 라벨 안에 글자를 가운데로 정렬하겠다.              
+
+class MW (QMainWindow):                                                            #메인윈도우에 대해 지정하겠습니다. 큐메인윈도 가져와서 쓸거임                  
+
+    def __init__(self):                                                            # 기본값 지정 큐메인 윈도우 상속받고, 기본값 지정                      
+        super().__init__()
+        self.init_ui()                                                             #init_ui 불러오기                  
+
+    def init_ui(self):                                                             #인잇유아이라는건 뭐냐              
+        self.setWindowTitle("Ex: QHBoxLayout")                                     #위 타이틀바에 ex:qhvoxlayout 적겠다.          
+        self.setup_main_wnd()                                                      #이 함수 불러올게                  
+        self.show()                                                                #실행해봐 보여줘         
+
+    def setup_main_wnd(self):                                                      #이 함수는 무엇이냐                      
+
+        lm = QHBoxLayout()                                                         #lm=가로로 계속 배치하겠다.                  
+
+        colors = ['red','green', 'blue', 'magenta', 'yellow']                      #이 리스트를 colors라고 변수 지정, 리스트 내용은 다음과 같다                          
+
+        for i,c in enumerate(colors):                                              #i,c라는 변수에다가 리스트값에 대해 번호,      
+            lm.addWidget(DsLabel(str(i),c))                                        #가로로 배치 위에 dslabel에서 변수 지정한것처럼 text, color로 받을거 , test는 리스트 인덱싱, 슬라이싱 한 숫자값 문자열로 받기, 색은 그대로 가져오기      
+                                                                                   #네모 칸 안에 숫자가 써지고, 배경색으로 색 가지는거로                      
+        dummy = QWidget()                                                          #변수지정, 빈 위젯 하나 만들고 그걸 더미라는 변수에 저장   (게시판위에 필름 붙이기 )               
+        dummy.setLayout(lm)                                                        #필름에다가 lm 붙이기                     
+
+        self.setCentralWidget(dummy)                                               #이 필름을 가지고 게시판 중앙에 붙일게요                  
+
+if __name__ == "__main__":                                                         #여기에서만 실행되고 다른곳에선 못열게                                                         
+    app = QApplication(sys.argv)                                                   # 종료하고, 메모리값 0 만들거야             
+    main_wnd = MW()
+    sys.exit(app.exec())  
