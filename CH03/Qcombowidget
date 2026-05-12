@@ -1,0 +1,75 @@
+import sys
+
+try:
+    from PySide6.QtWidgets import (
+        QApplication, QWidget, QLabel,
+        QVBoxLayout, QComboBox,
+    )
+    qt_modules = 'PySide6'
+except ImportError:
+    try:
+        from PyQt6.QtWidgets import (
+            QApplication, QWidget, QLabel,
+            QVBoxLayout, QComboBox,
+        )
+        qt_modules = 'PyQt6'
+    except ImportError:
+        print("PySide6 또는 PyQt6가 설치되어 있지 않습니다.")
+        sys.exit(1)
+
+print(f"Using {qt_modules} binding.")
+
+
+class MW(QWidget):
+
+    def __init__(self):
+        super().__init__()
+        self.init_ui()
+
+    def init_ui(self):
+        self.setWindowTitle("Ex: QComboBox")
+        self.resize(400, 200)
+        self.setup_main_wnd()                                      #큐콤보박스 사용할겁니다.
+        self.show()
+
+    def setup_main_wnd(self):
+        lm = QVBoxLayout()
+        lm.addWidget(QLabel('What is most important?'))            #뭐가중요한가를 가장 위에다가 박아 넣겠다. 
+
+        self.items = ['faith', 'hope', 'love']                     #아이템즈라는 곳에 (faith', 'hope', 'love)리스트값 저장  
+
+        self.cb = QComboBox()                                      #cb를 큐콤보박스라는 툴 가져오기             
+        self.cb.addItems(self.items)                               #에드아템즈라는 메서드로 cb라는 변수값에다가 아이템즈를 추가 시켜라  
+
+        # signal 연결
+        self.cb.activated.connect(self.on_selected)                #cb가 엑티브 될 때 아래 함수 호출하고 연결하세요 
+        self.cb.currentIndexChanged.connect(self.on_current_idx_changed)    #cb에서 현재 인덱스 값이 바뀌었다면 함수 호출하고 연결하세요 
+
+        lm.addWidget(self.cb)                                       #다음 행에 콤보박스를 추가하세요  
+
+        self.dp_label = QLabel("")                                  #dp_label이란 변수를 큐라벨 가져와서 공란으로 지정하겠다. 
+        lm.addWidget(self.dp_label)                                 #다음행에 설치하겠다. 
+
+        self.setLayout(lm)                                          #게시판에 도장꽝 
+
+    def on_selected(self, idx: int):                                #콤보박스와 연결된 함수 이제 설명하겠다. 인덱스 값 가져와서 정수로 받겠다
+        """activated signal 처리.
+        사용자가 item을 클릭할 때마다 호출됨.
+        동일 item을 다시 클릭해도 emit됨.
+        """
+        tmp = f"you selected: {self.items[idx]}"                    #cmd에 you selected: {self.items[idx]} 인덱스에 해당해당하는 리스트값을 가져오기  fatih or hope or love 호출 
+        print(tmp)
+        self.dp_label.setText(tmp)                                  #큐라벨 공백 > dp 이거에 대해 cmd에 출력한 글귀를 창에도 뜨게 하겠다. 
+
+    def on_current_idx_changed(self, idx: int):                     #현재 지정한 목록이 바뀌었을 경우 라는 함수에 대해 설명하겠다. 목록에 대해 정수형으로      
+        """currentIndexChanged signal 처리.
+        선택된 index가 실제로 변경된 경우에만 호출됨.
+        코드에서 setCurrentIndex() 호출 시에도 emit됨.
+        """
+        print(f"currentIndexChanged: {idx}")                          #이거로 바뀌었습니다를 cmd로 숫자로 알려주겠다. 
+
+
+if __name__ == "__main__":                                          #종료 
+    app = QApplication(sys.argv)
+    main_wnd = MW()
+    sys.exit(app.exec())
