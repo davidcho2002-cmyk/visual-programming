@@ -1,0 +1,74 @@
+# ds_qradiobutton_ex0.py
+import sys                                                      시스템 가져오자 
+
+try:
+    from PySide6.QtWidgets import (
+        QApplication, QWidget, QLabel,
+        QVBoxLayout, QRadioButton, QButtonGroup,
+    )
+    qt_modules = 'PySide6'
+except ImportError:
+    try:
+        from PyQt6.QtWidgets import (
+            QApplication, QWidget, QLabel,
+            QVBoxLayout, QRadioButton, QButtonGroup,
+        )
+        qt_modules = 'PyQt6'
+    except ImportError:
+        print("PySide6 또는 PyQt6가 설치되어 있지 않습니다.")
+        sys.exit(1)
+
+print(f"Using {qt_modules} binding.")
+
+
+class MW(QWidget):
+
+    def __init__(self):
+        super().__init__()
+        self.init_ui()
+
+    def init_ui(self):
+        self.setWindowTitle("Ex: QRadioButton")
+        self.resize(400, 200)
+        self.setup_main_wnd()
+        self.show()
+
+    def setup_main_wnd(self):
+        # QRadioButton 3개 생성
+        self.rb01 = QRadioButton('1. faith')                                    #라디오 버튼 : 단일체크가 가능한 원형 버튼 
+        self.rb02 = QRadioButton('2. hope')
+        self.rb03 = QRadioButton('3. love')
+
+        # 선택 결과 표시용 label 생성
+        self.dp_label = QLabel("")                                              #큐라벨 가져와서"" 지정만 하기 
+  
+        # layout 설정
+        lm = QVBoxLayout()
+        lm.addWidget(QLabel('What is most important?'))
+        lm.addWidget(self.rb01)
+        lm.addWidget(self.rb02)
+        lm.addWidget(self.rb03)
+        lm.addWidget(self.dp_label)
+        self.setLayout(lm)
+
+        # QButtonGroup으로 3개의 버튼을 하나의 그룹으로 묶음
+        # → 그룹 내에서 하나만 선택 가능하도록 exclusive 동작이 적용됨      #복수선택 금지 묶어주기 
+        self.bg = QButtonGroup(self)  
+        self.bg.addButton(self.rb01)
+        self.bg.addButton(self.rb02)
+        self.bg.addButton(self.rb03)
+
+        # 그룹 내 버튼 클릭 시 slot 연결
+        self.bg.buttonClicked.connect(self.on_button_clicked)                  #버튼 눌릴때 이하 함수 호출 
+
+    def on_button_clicked(self, button):                                       #온버튼클릭드 정의  
+        """그룹 내 버튼 클릭 시 호출됨.  
+        클릭된 button instance가 인자로 전달되므로 text()로 내용을 가져옴.
+        """
+        self.dp_label.setText(button.text())                                   #버튼위의 텍스트 출력창에 동기화  
+
+
+if __name__ == "__main__":                                                      #종료
+    app = QApplication(sys.argv)
+    main_wnd = MW()
+    sys.exit(app.exec())
