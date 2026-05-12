@@ -1,0 +1,144 @@
+# ds_qgroupbox_ex0.py
+
+import sys
+
+try:
+    from PySide6.QtWidgets import (
+        QApplication, QWidget,
+        QRadioButton, QCheckBox, QButtonGroup,
+        QHBoxLayout, QVBoxLayout,
+        QGroupBox,
+    )
+    from PySide6.QtCore import Qt
+    qt_modules = 'PySide6'
+except ImportError:
+    try:
+        from PyQt6.QtWidgets import (
+            QApplication, QWidget,
+            QRadioButton, QCheckBox, QButtonGroup,
+            QHBoxLayout, QVBoxLayout,
+            QGroupBox,
+        )
+        from PyQt6.QtCore import Qt
+        qt_modules = 'PyQt6'
+    except ImportError:
+        print("PySide6 또는 PyQt6가 설치되어 있지 않습니다.")
+        sys.exit(1)
+
+print(f"Using {qt_modules} binding.")
+
+
+class MW(QWidget):
+
+    def __init__(self):
+        super().__init__()
+        self.init_ui()
+
+    def init_ui(self):
+        self.setMinimumSize(400, 200)
+        self.setWindowTitle("QGroupBox Ex")
+        self.setup_main_wnd()
+        self.show()
+
+    def setup_main_wnd(self):
+        lm = QHBoxLayout()                                                                #가로로 정렬 
+
+        # 왼쪽 - QCheckBox 그룹 (복수 선택 가능, enable/disable 토글 가능)                #버튼그룹과 달리 프레임을 포함하고 제목 달 수 있고, 자식 버튼 가지고있음  
+        self.grp_checks = QGroupBox("QCheckBox Grp")                                            
+        self.grp_checks.setCheckable(True)                                              #checkable 그룹박스에서 체크가 가능하게 하겠다.  
+        self.grp_checks.setChecked(False)   # 초기 상태 - disabled                       #기본상태는 선택 해제 상태                  
+
+        # 오른쪽 - QRadioButton 그룹 (하나만 선택 가능)
+        self.grp_radios = QGroupBox("QRadioButton Grp")                                 #grp_radios 를 큐그룹박스 툴을 가지고 와서 큐라디오버튼 그룹이라는 변수지정        
+
+        lm.addWidget(self.grp_checks)                                                  #왼쪽에 체크박스 그룹              
+        lm.addWidget(self.grp_radios)                                                  #오른쪽에 라디오버튼 그룹           
+        self.setLayout(lm)                                                             #게시판 도장꽝   
+ 
+        self.set_checks()                                                              #함수호출      
+        self.set_radios()                                                              #함수호출      
+
+    def set_checks(self):                                                              #체크박스는 이거다       
+        lm = QVBoxLayout()                                                             #세로로 배치하겠다 이제    
+                                                                                       #self로 전체에다가 영향 주기 / lm말고 다름 변수 사용시 다음 행으로 움직이기에 우리가 사용하려는 그룹박스 내부에서 지정하기 위해 lm을 나올때마다 바꿔준다      
+        self.bg_checks = QButtonGroup()                                                #버튼그룹 체크/ 큐버튼그룹 툴 가져오기     
+        self.bg_checks.setExclusive(False)  # 복수 선택 허용                            #복수선택 할게요                    
+        for idx in range(3):                                                           # 반복문으로 012 지정하겠다. 
+            cb = QCheckBox(f"check {idx}")                                             #cb를 변수로 두고 체크박스에서 check에서 {0 or 1 or 2 }
+            self.bg_checks.addButton(cb)                                               #이걸 세로로 정렬 
+            lm.addWidget(cb)                                                           #임시저장      
+        self.grp_checks.setLayout(lm)                                                  # 게시판 도장꽝   
+
+        self.bg_checks.buttonClicked.connect(self.on_check_clicked)                    #내부 관련 함수 호출 
+        self.grp_checks.clicked.connect(self.on_grp_checks_clicked)                    #프레임쪽 관련 함수 호출     
+
+    def set_radios(self):                                                              #라디오스 설정   
+        lm = QVBoxLayout()                                                             #여기서 lm은 세로로 설정할게요    
+
+        self.bg_radios = QButtonGroup()                                                #버튼그룹 라디오스=큐버튼그룹이라는 툴 가져오기                 
+        self.bg_radios.setExclusive(True)   # 하나만 선택 가능                          #단일선택만 가능           
+        for idx in range(3):                                                           #반복문으로 사용 
+            rb = QRadioButton(f"radio {idx}")                                          #rb를 변수로 지정하고 큐라디오버튼사용해서 radio{0 or 1 or 2 }  
+            self.bg_radios.addButton(rb)                                               #버튼그룹라디오스에 버튼 저장하기          
+            lm.addWidget(rb)                                                           #세로로 두고 임시저장하기 
+        self.grp_radios.setLayout(lm)                                                  #그룹 라디오스 게시판 도장 꽝  
+
+        self.bg_radios.buttonClicked.connect(self.on_radio_clicked)                    #라디오버튼 그룹에 대해서 (오른쪽) 내부에 있는거 함수 호출     
+        self.grp_radios.clicked.connect(self.on_grp_radios_clicked)                    #오른쪽 외부 프레임에 선택 관련 함수 호출     
+
+    def on_check_clicked(self, button):                                                #이 함수가 뭐냐면      
+        """QCheckBox 그룹 내 버튼 클릭 시 호출됨.
+        현재 checked 상태인 모든 check box를 출력함.
+        """
+        print(f"sender: {self.sender()}, clicked: {button.text()}")                    #cmd에다가 쓸거에요 / sender: 로 저새끼가 그랬어요 하고 신호를 알려줌, 이름은 안알려줘요/ 클릭드: 버튼 텍스트로, 버튼 이름 알려주기               
+
+        for cb in self.bg_checks.buttons():                                            #변수: 버튼그룹 체크박스(왼쪽) 에 대해 
+            if cb.isChecked():                                                         #만약 버튼그룹에서 불러온 애가 체크박스에서 체크가 되었다고 저장된다면    
+                print(f"  checked: {cb.text()}")                                       #프린트해라 cmd에 체크된 버튼의 이름을 모두 출력하겠다.         
+
+        print("======================\n")                                              #하면 cmd에    "======================\n" 출력    
+
+        # bg_checks.checkedButton() 동작 테스트 (주석 해제 후 확인 권장)
+        # non-exclusive 모드에서는 list가 아닌 객체 하나만 반환됨.
+        # - check 시 : 해당 checked button 반환
+        # - uncheck 시 : checked 상태 중 index가 가장 낮은 버튼 반환
+        # - 전체 uncheck 시 : None 반환
+        # a = self.bg_checks.checkedButton()
+        # print(a.text() if a is not None else 'not checked!')
+        # print("======================")
+
+    def on_radio_clicked(self, radio_btn):                                             #함수에 대해 설명하겠습니다.   
+        """QRadioButton 그룹 내 버튼 클릭 시 호출됨.
+        현재 checked 상태인 radio button의 index와 text를 출력함.
+        """
+        print(f"sender: {self.sender()}, clicked: {radio_btn.text()}")                 #cmd프린트하세요 저새끼가 그랬어요 신호만 보내기/ 저새끼가 그랬어요 이름 알려주기 
+
+        for idx, rb in enumerate(self.bg_radios.buttons()):                            #enumerate:인덱싱하기 idx, rb두개 받고싶어요     
+            if rb.isChecked():                                                         #만약에 rb가 체크되었다면 
+                print(f"  checked: [{idx}] {rb.text()}")                               #cmd프린트하세요 인덱싱 했을때 번호와 버튼의 이름을          
+
+        print("======================\n")                                              #======================\n 다했으면 이거 프린트하라   
+
+        # bg_radios.checkedButton() 동작 테스트 (주석 해제 후 확인 권장)
+        # a = self.bg_radios.checkedButton()
+        # print(a.text() if a is not None else 'not checked!')
+        # print("======================")
+
+    def on_grp_checks_clicked(self, checked: bool):                                   #왼쪽 프레임 체크여부를 불린으로 가지고 오겠다 
+        """QGroupBox title의 check box 클릭 시 호출됨.
+        checked=True이면 child widget 전체 enable,                                        
+        checked=False이면 child widget 전체 disable.
+        """
+        print(f"checks group - checked: {checked}")                                   #프레임이 선택되었는지 여부를 불린으로 가져오고 이걸 cmd에다가 출력하라 
+
+    def on_grp_radios_clicked(self, checked: bool):                                    #오른쪽 프레임 체크여부를 불린으로 갖고 오겠다. 
+        """QGroupBox title의 check box 클릭 시 호출됨 (setCheckable 설정 시).
+        이 예제에서 grp_radios는 setCheckable을 설정하지 않았으므로 호출되지 않음.
+        """
+        print(f"radios group - checked: {checked}")                                    #불린값을 출력 cmd에다가 
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    wnd = MW()
+    sys.exit(app.exec())                                                                    #종료 
