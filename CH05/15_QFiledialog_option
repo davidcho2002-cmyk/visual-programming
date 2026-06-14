@@ -1,0 +1,53 @@
+import sys
+
+from PySide6.QtWidgets import (
+    QApplication,
+    QFileDialog,
+    QMainWindow,
+    QMessageBox,
+    QPushButton,
+)
+
+
+class MW(QMainWindow):
+
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("QFileDialog.Option Example")
+
+        # button을 누르면 options가 적용된 directory 선택 dialog가 표시됨.
+        button = QPushButton("Open Directory with Options", self)
+        button.clicked.connect(self.open_directory_with_options)
+
+        self.setCentralWidget(button)
+        self.show()
+
+    def open_directory_with_options(self):                              
+        # 여러 option은 bitwise OR 연산자 | 로 함께 지정할 수 있음.
+        options = (
+            QFileDialog.Option.ShowDirsOnly
+            | QFileDialog.Option.DontResolveSymlinks                    #바로가기 링크 
+        )
+
+        directory_path = QFileDialog.getExistingDirectory(
+            self,
+            "Select a Directory",
+            "",
+            options,                                                    #폴더 내부를 옵션 안에 있는거로 확인 
+        )
+
+        if directory_path:
+            QMessageBox.information(
+                self,
+                "Selected Directory",
+                f"Directory: {directory_path}",
+            )
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+
+    window = MW()
+
+    sys.exit(app.exec())
