@@ -1,0 +1,103 @@
+import sys                  #기본값 설정 
+import time
+
+from PySide6.QtCore import QObject, QRunnable, QThreadPool, Signal, Slot
+from PySide6.QtWidgets import QApplication, QLabel, QPushButton, QVBoxLayout, QWidget
+
+
+class TaskSignals(QObject):                         
+    # QRunnable은 QObject가 아니므로 Signal을 직접 선언하지 않음.
+    # 대신 QObject를 상속한 별도 class에서 signal을 선언함.
+    update_signal = Signal(str, int)            #신호 내보낼게요 
+
+
+class Task(QRunnable):
+    def __init__(self, num):
+        super().__init__()
+
+        # num은 label index로도 사용하므로 0부터 시작함.
+        self.num = num                          #작업번호를 수자로 가져오기 
+
+        # 작업 진행 상태를 main thread로 전달하기 위한 signal 객체.
+        self.signals = TaskSignals()                #신호 담는 변수 
+
+    def run(self): #tasksignal에 상속받아 오겠습니다 
+        # 이 method는 QThreadPool 내부의 worker thread에서 실행됨.
+        # 따라서 이 안에서 QLabel 같은 GUI widget을 직접 수정하면 안 됨.
+        for i in range(101):                            #1부터100까지 반복 
+            time.sleep(0.1)  # 작업을 모방하기 위한 시간 지연   #0.1초 간격 
+
+            # GUI 갱신 요청은 signal을 통해 main thread로 전달함.
+            # num은 0부터 시작하지만, 사용자에게 보여줄 때는 1부터 표시함.
+            self.signals.update_signal.emit(                   
+                f"Task {self.num + 1}: {i}% completed",     #뭔가를 보낸다 , 첫번째 작업 1, 2, 3 이런식으로 하고, 백분율로 보이게 
+                self.num                                    #작업완료 표시해주기 
+            )
+
+        # 작업 완료 메시지 전송.
+        self.signals.update_signal.emit(                    #진행도 알려주기 
+            f"Task {self.num + 1}: Task completed!",
+            self.num
+        )
+
+
+class MainWindow(QWidget):              #메인윈도우 설명 
+    def __init__(self):
+        super().__init__()
+        self.init_ui()
+        self.show()
+
+    def init_ui(self):
+        self.layout = QVBoxLayout(self)
+
+        # QRunnable은 thread 자체가 아니라 task이므로,
+        # 화면 표시도 Thread가 아니라 Task로 표현함.
+        self.labels = [                                                 #라벨 진행중인 스레드의 숫자에 맞춰 몇번째 작업이 실행되는지, 
+            QLabel(f"Task {i + 1}: Waiting to start...", self)
+            for i in range(3)                                           #1번 기다림, 2 기다림, 3 기다림
+        ]
+
+        for label in self.labels:                                       #라벨 세개 만든거 하나씩 꺼내 쓰기 
+            self.layout.addWidget(label)                                #하나씩 박아 넣기 
+
+        self.start_button = QPushButton("Start All Tasks", self)            #버튼에 이런 내용 쓰기 
+        self.start_button.clicked.connect(self.start_tasks)                 #스타트 테스크 불러오기 
+        self.layout.addWidget(self.start_button)                            #배치도 
+
+        # Qt application 전체에서 공유되는 global thread pool 사용.
+        self.pool = QThreadPool.globalInstance()                            #pool변수 = 전용으로 공유되는 인스턴스 
+
+    @Slot()                                                                 
+    def start_tasks(self):                                                  #버튼 누르면 실행되기 
+        # 버튼을 여러 번 눌러 동일한 작업들이 중복 등록되는 것을 막음.
+        self.start_button.setEnabled(False)                                 #버튼 세개 비활성화 
+
+        for i in range(3):                                                  #012 
+            # 각 작업마다 QRunnable 객체를 새로 생성함.
+            # 기본 autoDelete=True이므로 작업 완료 후 QThreadPool이 객체를 정리함.
+            task = Task(i)                                                  #번호따라서 업무 움직이는거 넣기 
+
+            # 작업을 시작하기 전에 signal-slot connection을 먼저 수행해야 함.
+            # start() 이후에 connect하면 작업이 먼저 signal을 emit할 수 있음.
+            task.signals.update_signal.connect(self.update_label)           #문자열 +번호열 그 시그널 보내면 연결 하겠음 
+
+            # QRunnable 작업을 thread pool에 추가함.
+            # 실제 run()은 QThreadPool 내부 worker thread에서 실행됨.
+            self.pool.start(task)                           #작업 스타트 하겠습니당 
+
+    @Slot(str, int)
+    def update_label(self, message, idx):                       #라벨 업데이트 신호 두개 줬으니 두개 받아오기
+        # 이 slot은 main thread에서 실행되므로 GUI widget 수정 가능.
+        self.labels[idx].setText(message)                       # 번호에 대해 변화되는것을 실시간으로 업데이트 시켜주겠다 
+
+        # 모든 task가 완료되면 버튼을 다시 활성화함.
+        if all(label.text().endswith("Task completed!") for label in self.labels):     #안의 조건이 참인 경우 라벨 하나씩 되게끔 / 업무 제대로 종료되었는지 검사하기 
+            self.start_button.setEnabled(True)
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)            #종료 
+
+    window = MainWindow()
+
+    sys.exit(app.exec())
