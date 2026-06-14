@@ -1,0 +1,58 @@
+import sys                                        #쓸거 가져오기 
+
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (
+    QApplication,
+    QLabel,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+)
+
+
+class MW(QWidget):
+    def __init__(self):                                            #시작할때 기본적으로 사용하는거 
+        super().__init__()
+        self.init_ui()
+
+    def init_ui(self):                                              #윈도우 기본 설정 
+        self.setWindowTitle("DirectConnection Ex")                  
+        self.resize(380, 180)
+
+        self.label = QLabel("Button을 클릭하면 Slot이 즉시 실행됨.")      #큐라벨 큐푸쉬버튼 만들기 
+        self.button = QPushButton("Click Me")
+
+        # DirectConnection: Slot이 즉시 호출됨.                        #버튼이랑 실행되는거랑 연결되게 
+        self.button.clicked.connect(
+            self.on_clicked,
+            Qt.ConnectionType.DirectConnection,                       #연결방식 종류 바로 직접 호출하기 
+        )
+
+        layout = QVBoxLayout()                                          #단순정렬
+        layout.addWidget(self.label)
+        layout.addWidget(self.button)
+        self.setLayout(layout)
+
+    def on_clicked(self):                                            #이하 함수를 칭한다
+        """
+        DirectConnection으로 연결된 Slot.
+
+        Signal이 emit되면 이 method가                              
+        emit한 thread에서 즉시 호출됨.
+        Event System을 거치지 않는 직접 함수 호출임.
+        """
+
+        import threading                                                      #SCV가져오기 
+
+        tid = threading.current_thread().name                                  #일하는 중인 SCV 이름 알아오기 
+        print(f"[DirectConnection] on_clicked() called in: {tid}")            #CMD 출력
+        self.label.setText(
+            f"Slot executed directly in: {tid}"                                #라벨 수정 후 반영
+        )
+
+
+if __name__ == "__main__":                                                #종료 
+    app = QApplication(sys.argv)
+    window = MW()
+    window.show()
+    sys.exit(app.exec())
