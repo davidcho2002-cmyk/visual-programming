@@ -1,0 +1,48 @@
+import sys                  #시작하겠습니당
+
+from PySide6.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QPushButton,
+)
+
+
+class MW(QMainWindow):                      
+    def __init__(self):
+        super().__init__()
+
+        # Main window의 title 설정.
+        self.setWindowTitle("QDialog Example")
+
+        # Dialog를 띄우기 위한 테스트용 button 생성.
+        button = QPushButton("Press me for a dialog!", self)
+
+        # button이 click되면 button_clicked method가 호출되도록 연결.
+        button.clicked.connect(self.button_clicked)
+
+        # button을 QMainWindow의 central widget으로 설정.
+        self.setCentralWidget(button)
+
+        # Main window를 화면에 표시.
+        self.show()
+
+    def button_clicked(self, checked):
+        # Dialog 관련 기능 테스트를 위한 method.
+        # checked는 QPushButton이 checkable일 때 현재 선택 상태를 나타냄.
+        # 일반 QPushButton에서는 보통 False가 전달됨.
+        print("click", checked)
+
+        # ----------------------
+        # 이후 예제에서 이 위치에 
+        # dialog 관련 코드가 작성될 예정임.
+
+
+if __name__ == "__main__":
+    # Qt application 객체 생성.
+    app = QApplication(sys.argv)
+
+    # Main window 객체 생성.
+    wnd = MW()
+
+    # Qt event loop 시작.
+    app.exec()
