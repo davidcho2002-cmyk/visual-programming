@@ -1,0 +1,48 @@
+import sys
+
+from PySide6.QtWidgets import (
+    QApplication,
+    QFileDialog,
+    QMainWindow,
+    QMessageBox,
+    QPushButton,
+)
+
+
+class MW(QMainWindow):
+
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("QFileDialog File Filter Example")
+
+        # button을 누르면 여러 file filter를 가진 dialog가 표시됨.
+        button = QPushButton("Open File with Filter", self)
+        button.clicked.connect(self.open_file_with_filter)
+
+        self.setCentralWidget(button)
+        self.show()
+
+    def open_file_with_filter(self):                                    #확장자 명에 따라서 파일 필터링 해서 보여주기 
+        # 여러 filter를 제공할 때는 ';;'로 구분함.
+        file_name, selected_filter = QFileDialog.getOpenFileName(
+            self,
+            "Open file",
+            "",
+            "HTML Files (*.html);;Text Files (*.txt);;Python Files (*.py);;All files (*.*)",
+        )
+
+        if file_name:                                                   #메시지 박스에 나오기 
+            QMessageBox.information(
+                self,
+                "Selected File",
+                f"File: {file_name}\nFilter: {selected_filter}",
+            )
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+
+    window = MW()
+
+    sys.exit(app.exec())
