@@ -1,0 +1,62 @@
+import sys, os                              #시작할게요 
+
+from PySide6.QtWidgets import (
+    QApplication, QMainWindow, 
+    QToolBar, QMessageBox,
+)
+from PySide6.QtGui import (
+    QAction, QIcon,
+)
+
+class MW(QMainWindow):                      #기본값설정 
+    def __init__(self):
+        super().__init__()
+        self.setup_main_wnd()
+
+    def setup_main_wnd(self):           #위젯 설정 
+        # 윈도우 설정
+        self.setWindowTitle("Ex0: QToolBar")
+        self.setGeometry(300, 300, 300, 200)
+        root_dir = os.path.dirname(__file__)        #폴더 경로 저장 
+        self.create_actions(root_dir)               #폴더 경로에 대해서 작동하게끔 함수 지정 
+        self.create_toolbar()                       #툴바 생성 후술 
+        self.show()
+
+    def create_actions(self, root_dir):             #이거 설명할거야 
+
+        icon0_path = os.path.join(root_dir,             #파일 폴더경로, 사진 경로 합치기 
+                                 'baseline_compress_black_36pt_3x.png')
+        icon1_path = os.path.join(root_dir,             #파일 폴더경로, 사진 경로 합치기 
+                                 'baseline_favorite_black_36pt_1x.png')
+        # 툴바에 액션 추가
+        self.button_action0 = QAction("action0", self)                  #툴바 동작 하게끔 
+        self.button_action0.setStatusTip("This is the first button")    #도움말
+        self.button_action0.setIcon(QIcon(icon0_path))                  #사진 가져오기 
+        self.button_action0.setShortcut('Ctrl+0')                       #단축키 설정 
+        self.button_action0.triggered.connect(self.onAction0)           #이거 누르면 온액션0할거야 
+
+        # 또 다른 액션 추가
+        self.button_action1 = QAction("action1", self)                      #이하 동일 컨1으로 바꿨을 뿐 
+        self.button_action1.setStatusTip("This is the second button")
+        self.button_action1.setIcon(QIcon(icon1_path))
+        self.button_action1.setShortcut('Ctrl+1')
+        self.button_action1.triggered.connect(self.onAction1)
+
+    def create_toolbar(self):                                   
+        # 툴바 생성
+        self.toolbar = QToolBar("Main Toolbar")             #메인툴바라는 이름 
+        self.addToolBar(self.toolbar)                       #툴바 추가 
+        self.toolbar.addAction(self.button_action0)         #0, 1 두개 툴바 추가할 것 
+        self.toolbar.addAction(self.button_action1)
+
+
+    def onAction0(self):                                    #메시지 뜰 것 , 첫번째버튼 눌렀어요 
+        QMessageBox.information(self, "Message", "You clicked the first button!")
+
+    def onAction1(self):                                    #메시지 뜰 것, 두번째 버튼 눌렀어요 
+        QMessageBox.information(self, "Message", "You clicked the second button!")
+
+if __name__ == "__main__":  #종료 
+    app = QApplication(sys.argv)
+    wnd = MW()
+    sys.exit(app.exec())
