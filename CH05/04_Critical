@@ -1,0 +1,56 @@
+import sys                              #실행이요 
+
+from PySide6.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QPushButton,
+    QMessageBox,
+)
+
+
+class MW(QMainWindow):              #메인 윈도우 설정 
+    def __init__(self):
+        super().__init__()
+
+        # main window의 title 설정.
+        self.setWindowTitle("QMessageBox.critical Example")
+
+        # dialog를 띄우기 위한 button 생성.
+        button = QPushButton("Press me for a dialog!", self)
+
+        # button 클릭 시 button_clicked method가 호출되도록 signal-slot 연결.
+        button.clicked.connect(self.button_clicked)
+
+        # button을 main window의 central widget으로 지정.
+        self.setCentralWidget(button)
+
+        # main window 표시.
+        self.show()
+
+    def button_clicked(self, checked):
+        # button click signal에서 전달된 checked 상태 출력.
+        print("click", checked)
+
+        # critical dialog 표시.
+        # 심각한 오류 message를 사용자에게 보여줄 때 사용함.
+        result = QMessageBox.critical(
+            self,
+            "Critical",
+            "This is a critical error message.",
+            QMessageBox.StandardButton.Ok,
+            QMessageBox.StandardButton.Ok,
+        )
+
+        # 사용자가 누른 button 값 출력.
+        print("Dialog result:", result)
+
+
+if __name__ == "__main__":
+    # Qt application instance 생성.
+    app = QApplication(sys.argv)
+
+    # main window instance 생성.
+    wnd = MW()
+
+    # Qt event loop 실행.
+    app.exec()
