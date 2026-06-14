@@ -42,7 +42,7 @@ class MW(QWidget):
         Event System을 거치지 않는 직접 함수 호출임.
         """
 
-        import threading                                                      #SCV가져오기 
+        import threading                                                      #일꾼 관련된 함수 가져오기 
 
         tid = threading.current_thread().name                                  #일하는 중인 SCV 이름 알아오기 
         print(f"[DirectConnection] on_clicked() called in: {tid}")            #CMD 출력
