@@ -1,0 +1,97 @@
+import sys
+import time
+
+from PySide6.QtCore import QThread, Qt, Signal                              #도구 가져오기 
+from PySide6.QtWidgets import (
+    QApplication,
+    QLabel,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+)
+
+
+class Worker(QThread):                                                  #메인 프로그램과 별개로 별도로 작업 
+    """
+    별도의 thread에서 작업을 수행하고
+    완료 시 Signal을 emit하는 worker.
+    """
+
+    work_done = Signal(str)                 #일이끝날때 전달할 신호 
+
+    def run(self):                                  #일하기 시작하면 그 이후에 지정할 행동 양식 
+        import threading
+
+        tid = threading.current_thread().name                       #이름가져오기, cmd 출력하기 , 대기하면서 시뮬 돌리기 
+        print(f"[Worker] run() executing in: {tid}")
+
+        # 시간이 걸리는 작업을 simulation.
+        time.sleep(1)
+
+        self.work_done.emit(f"Work completed in: {tid}")            #결과물 출력 cmd로 
+
+
+class MW(QWidget):                      #위젯 기본 설정 
+    def __init__(self):
+        super().__init__()
+        self.worker = None
+        self.init_ui()
+
+    def init_ui(self):
+        self.setWindowTitle("QueuedConnection Ex")
+        self.resize(420, 180)
+
+        self.label = QLabel(
+            "Button을 누르면 worker thread에서 작업 후\n"
+            "main thread의 Slot이 비동기로 호출됨."
+        )
+        self.button = QPushButton("Start Worker")
+        self.button.clicked.connect(self.start_worker)
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.label)
+        layout.addWidget(self.button)
+        self.setLayout(layout)
+
+    def start_worker(self):                                 #일꾼 일 시키는 메서드 
+        self.button.setEnabled(False)                       #버튼 못누르게 막기 
+        self.label.setText("Worker thread 실행 중...")  #라벨 수정해서 작업 시작 알리기 
+
+        self.worker = Worker()  #실제 일꾼 객체로 새로 생성
+
+        # QueuedConnection: Slot이 receiver(main)의
+        # Event Loop에서 비동기적으로 실행됨.
+        self.worker.work_done.connect(      #신호 주고받는것에 대해 기본 프로토콜 정하기 
+            self.on_work_done,
+            Qt.ConnectionType.QueuedConnection,
+        )
+
+        self.worker.start()         #일하러 가세요 
+
+    def on_work_done(self, message):            #메시지 수신해서 최종 처리하는 사람의 행동양식 
+        """
+        QueuedConnection으로 연결된 Slot.
+
+        Worker thread에서 emit된 Signal이
+        main thread의 posted event queue에 등록된 뒤,
+        main thread의 Event Loop가 처리할 때 호출됨.
+        """
+
+        import threading                #스레딩 가져오기 
+
+        tid = threading.current_thread().name               #수신자 누군지 확인하기 
+        print(f"[QueuedConnection] on_work_done() called in: {tid}")        #수신된 내용 화면에 글자로 띄우기 
+        print(f"[QueuedConnection] message: {message}")
+
+        self.label.setText(                     #수신자가 확인하기 
+            f"Result: {message}\n"
+            f"Slot executed in: {tid}"
+        )
+        self.button.setEnabled(True)            #작업종료, 잠궈뒀던 버튼 풀기 
+
+
+if __name__ == "__main__":                                  #종료 
+    app = QApplication(sys.argv)
+    window = MW()
+    window.show()
+    sys.exit(app.exec())
