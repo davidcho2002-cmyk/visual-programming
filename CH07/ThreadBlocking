@@ -1,0 +1,106 @@
+import sys                          #시스템 실행할게요 
+import time
+
+from PySide6.QtCore import QThread, Signal          #시스템 기본값 
+from PySide6.QtWidgets import (
+    QApplication,
+    QLabel,
+    QProgressBar,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+)
+
+
+class WorkerThread(QThread):                            #워크 스레드 설명 
+    # 진행 상태를 int 값으로 전달하기 위한 signal.
+    update_signal = Signal(int)                         #업데이트 시그널 가지고 정수값으로 받겠다 
+
+    def __init__(self, thread_id):                      #기본값 정렬 
+        super().__init__()
+        self.thread_id = thread_id                      #벼수에집어넣어서 확실히 만질 수 있게 만들기 
+
+    def run(self):                                          #실행시키겠다 
+        # start() 호출 후 새 worker thread 안에서 실행됨.
+        for i in range(101):                                #0부터 100까지 
+            time.sleep(0.1)                                 #0.1s단위로 계속 스레드가 멈춤
+            self.update_signal.emit(i)                      #이 반복되는걸 신호로 해서 내보내겠다 
+
+
+class MW(QWidget):                          #메인 윈도우 설명 
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("QThread wait() Blocking Example")  #제목은 이거에요 
+
+        self.init_ui()
+        self.show()
+
+    def init_ui(self):                                  #유아이 생성 
+        self.layout = QVBoxLayout(self)
+
+        self.status_label = QLabel("Click 'Start All Threads' to run the threads", self)
+        self.layout.addWidget(self.status_label)
+
+        self.start_all_button = QPushButton("Start All Threads", self)               #도장 꽝 
+        self.start_all_button.clicked.connect(self.start_all_threads)
+        self.layout.addWidget(self.start_all_button)
+
+        self.progress_bars = []         #진행하는 바들을 담아 놓은 바구니 
+        self.threads = []               #쓰레드들 담아놓은 바구니 
+        self.buttons = []                  #버튼을 담아놓은 바구니 
+
+        for i in range(3):          #반복문 헬게이트 시작 
+            label = QLabel(f"Thread {i + 1} Example", self)         #편의성으로 쓰레드에 번호 1씩 +해서 알려주기 
+
+            progress_bar = QProgressBar(self)               #직진하는 바 하나 만들고, 변수에 입력 
+            progress_bar.setRange(0, 100)                   #0부터 100까지 렝지 잡자 
+
+            button = QPushButton(f"Start Thread {i + 1}", self)     #버튼 하나 만들어요 , 1부터 시작하는거로 
+            button.clicked.connect(self.make_start_thread(i))           #버튼 누르면 이후에 나오는 스레드 함수 가져오기 
+
+            self.layout.addWidget(label)                            #라벨 올리고 
+            self.layout.addWidget(progress_bar)                     #진행바 올리 
+            self.layout.addWidget(button)                           #버튼 올리고 
+
+            worker = WorkerThread(i)                                   # 워커라는 변수에 워커스레드 찍어두기 
+            worker.update_signal.connect(progress_bar.setValue)         #신호를 넘겨주면 프로그래스 바를 계속 올리겠다 
+
+            self.progress_bars.append(progress_bar)                 #리스트에 추가를 하겠다. 바, 스레드, 버튼 순서로 3까지 반복  
+            self.threads.append(worker)
+            self.buttons.append(button)
+
+    def make_start_thread(self, index):         #이 메이크 스레드 설명 
+        def start_thread():                     #하위에 스레드가 있다 
+            if not self.threads[index].isRunning():     #반복문에서 가져온 인덱스 번호 / wake up 신호 작동 안하면 하게끔 
+                self.threads[index].start()
+
+        return start_thread                     #스타트 스레드 값을 반환 
+
+    def start_all_threads(self):                #이 함수 알려주기 
+        self.status_label.setText("Threads are running...")     #라벨에 쓰레드가 움직입니다 
+
+        for thread in self.threads:             #모든 스레드들을 작동 시켜라 
+            if not thread.isRunning():
+                thread.start()
+
+        # 주의:
+        # 이 method는 GUI thread에서 호출됨.
+        # 따라서 내부에서 wait()를 호출하면 GUI thread가 block됨.
+        self.wait_for_threads_to_finish()               #아래 함수 가져오기 
+
+    def wait_for_threads_to_finish(self):               #어떤 함수냐 
+        for thread in self.threads:             
+            # 대상 worker thread가 종료될 때까지 현재 thread를 block함.
+            # 현재 thread가 GUI thread이므로 GUI event loop가 멈출 수 있음.
+            thread.wait()
+
+        self.status_label.setText("All threads completed!")
+
+
+if __name__ == "__main__":              #종료 
+    app = QApplication(sys.argv)
+
+    wnd = MW()
+
+    sys.exit(app.exec())
